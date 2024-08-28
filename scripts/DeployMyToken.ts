@@ -1,4 +1,5 @@
 // npx ts-node --files ./scripts/DeployMyToken.ts
+// https://sepolia.etherscan.io/address/0x2b168b730786420892a8a575823e5fa9e7797983
 
 import { createPublicClient, http, createWalletClient, formatEther } from "viem";
 
@@ -42,8 +43,6 @@ async function main() {
   const deployment = await deployer.deployContract({
     abi,
     bytecode: bytecode as `0x${string}`,
-    gas: 10000000n,
-    gasPrice: 150000000n,
   });
   // - LOG PROOF OF SUCCESSFUL CONTRACT DEPLOYMENT TRANSACTION
   console.log("Contract deployment transaction hash:", deployment);
