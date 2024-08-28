@@ -1,4 +1,13 @@
-// npx ts-node --files ./scripts/DK_DeployTokenizedBallot.ts "Proposal1" "Proposal2" "Proposal3" tokenAddress
+// npx ts-node --files ./scripts/DeployTokenizedBallot.ts 
+// PROPOSAL_NAMES
+// TOKEN_CONTRACT 
+// TARGET_BLOCK_NUMBER 
+
+// npx ts-node --files ./scripts/DK_DeployTokenizedBallot.ts 
+// "Proposal1" "Proposal2" "Proposal3" 
+// 0x2b168b730786420892a8a575823e5fa9e7797983
+// targetBlockNumber
+
 import { privateKeyToAccount } from "viem/accounts";
 import {
   createPublicClient,
