@@ -16,6 +16,7 @@ import { sepolia } from "viem/chains";
 import { abi, bytecode } from "../artifacts/contracts/MyToken.sol/MyToken.json";
 import * as dotenv from "dotenv";
 import * as readline from "readline";
+
 dotenv.config();
 
 const providerApiKey = process.env.ALCHEMY_API_KEY || "";
