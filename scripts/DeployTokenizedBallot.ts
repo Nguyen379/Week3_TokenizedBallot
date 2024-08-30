@@ -1,7 +1,7 @@
 // npx ts-node --files ./scripts/DeployTokenizedBallot.ts TOKEN_CONTRACT BLOCK_DURATION PROPOSAL_NAMES
-// npx ts-node --files ./scripts/DeployTokenizedBallot.ts 0x2b168b730786420892a8a575823e5fa9e7797983 14400 "Proposal1" "Proposal2" "Proposal3"
-// https://sepolia.etherscan.io/tx/0xf0ff28a4fdb003e884e3ba497e09f487cecde17a0d7b7f6a3298b2ab33c094c2
-// https://sepolia.etherscan.io/address/0x2f21fdeccb32a0b580e7fbb9517a2a63d3af690f
+// npx ts-node --files ./scripts/DeployTokenizedBallot.ts 0x2b168b730786420892a8a575823e5fa9e7797983 10 "Proposal1" "Proposal2" "Proposal3"
+// https://sepolia.etherscan.io/tx/0x9e4258003f767a64727d99bd92b10ffcdb5015bb3f5fdc2eb69dbbeb62c28abb
+// https://sepolia.etherscan.io/address/0x446df22ee48e11d354f39356b0f17f128f11fc43
 
 
 import { privateKeyToAccount } from "viem/accounts";
@@ -73,14 +73,14 @@ async function main() {
   });
   console.log(`ERC20 Token Contract Address: ${tokenAddress}`);
 
-  /// CREATE PUBLICCLIENT TO CONNECT TO SEPOLIA TESTNET USING POKT GATEWAY
+  /// CREATE PUBLIC CLIENT TO CONNECT TO SEPOLIA TESTNET USING POKT GATEWAY
   console.log("\nConnecting to blockchain with publicClient...")
   const publicClient = createPublicClient({
     chain: sepolia,
     transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`),
   });
 	
-  /// - PROVIDE PROOF OF SUCCESSFUL PUBLICCLIENT CREATION
+  /// - PROVIDE PROOF OF SUCCESSFUL PUBLIC CLIENT CREATION
   let blockNumber = await publicClient.getBlockNumber();
   console.log("Last block number:", blockNumber);
   /// - SET pastBlockNumber parameter

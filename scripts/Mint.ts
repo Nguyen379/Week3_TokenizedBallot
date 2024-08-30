@@ -1,6 +1,7 @@
 // npx ts-node --files ./scripts/Mint.ts TOKEN_ADDRESS TO_ADDRESS AMOUNT
-// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0x5aa7Fb0f965572a5639A84EEEcF34BFD9068d58c 1000
-// https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xa9bc3c02ec6efd65d7268c7ed78d2bc5d3673ee430bbd33c371c48e73ad8e615
+// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0x3aF0630677Cab3c5cEA8BBC67e4e96DaaDE21305 1000
+// https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xcca00d2a02dc0e5f7fea3cdc1732cad571d63c2f773ee3c43c31991b857735d2
+// https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xe0cc6ebf021f7650416bec3c5d684a990a42a6b526b2e60b24ea4dc3559e54ae
 
 import {
   createPublicClient,
