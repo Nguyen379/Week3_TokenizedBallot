@@ -1,7 +1,10 @@
 // npx ts-node --files ./scripts/Mint.ts TOKEN_ADDRESS TO_ADDRESS AMOUNT
-// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0x3aF0630677Cab3c5cEA8BBC67e4e96DaaDE21305 1000
+// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0x3aF0630677Cab3c5cEA8BBC67e4e96DaaDE21305 2000
+// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0x5aa7Fb0f965572a5639A84EEEcF34BFD9068d58c 1000
+// npx ts-node --files ./scripts/Mint.ts 0x2b168b730786420892a8a575823e5fa9e7797983 0xB6E7F3CF13b3000a2B0F5ea0C6202D91C7c3ff94 3000
 // https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xcca00d2a02dc0e5f7fea3cdc1732cad571d63c2f773ee3c43c31991b857735d2
 // https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xe0cc6ebf021f7650416bec3c5d684a990a42a6b526b2e60b24ea4dc3559e54ae
+// https://sepolia.etherscan.io/tx/https://sepolia.etherscan.io/tx/0xbad21be7e638032c9be3ffb4f8535c90a824a904e5e90bda40077440f50b3b65
 
 import {
   createPublicClient,
@@ -107,6 +110,15 @@ async function main() {
         toAddress
       )}\n`
     );
+    const tokenBalance = await publicClient.readContract({
+      address: myTokenContractAddress,
+      abi,
+      functionName: "balanceOf",
+      args: [toAddress],
+    });
+    console.log("MyToken Balance:", tokenBalance);
+
+
   } else {
     console.log("Operation cancelled");
   }

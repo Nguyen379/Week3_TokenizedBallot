@@ -51,7 +51,7 @@ contract TokenizedBallot {
         address voter
     ) public view returns (uint256 votePower_) {
         // Get past votes at the target block number
-        votePower_ = tokenContract.getPastVotes(voter, targetBlockNumber - 1); // (-1) to Avoid ERC5805FutureLookup
+        votePower_ = tokenContract.getPastVotes(voter, targetBlockNumber);
 
         // Subtract the votes that have already been spent
         votePower_ -= spentVotePower[voter];

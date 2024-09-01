@@ -1,8 +1,7 @@
 // npx ts-node --files ./scripts/DeployTokenizedBallot.ts TOKEN_CONTRACT BLOCK_DURATION PROPOSAL_NAMES
-// npx ts-node --files ./scripts/DeployTokenizedBallot.ts 0x2b168b730786420892a8a575823e5fa9e7797983 10 "Proposal1" "Proposal2" "Proposal3"
-// https://sepolia.etherscan.io/tx/0x9e4258003f767a64727d99bd92b10ffcdb5015bb3f5fdc2eb69dbbeb62c28abb
-// https://sepolia.etherscan.io/address/0x446df22ee48e11d354f39356b0f17f128f11fc43
-
+// npx ts-node --files ./scripts/DeployTokenizedBallot.ts 0x2b168b730786420892a8a575823e5fa9e7797983 5 "Proposal 1" "Proposal 2" "Proposal 3"
+// https://sepolia.etherscan.io/tx/0x37926640f4059ccf211788449d856a2c97aef36c2950bc9b7ddc021a5d004057
+// https://sepolia.etherscan.io/address/0x2bd6a1160bb05d2ea9ac57cb4584fca3c32e5d52
 
 import { privateKeyToAccount } from "viem/accounts";
 import {
@@ -35,20 +34,19 @@ const question = (questionText: string) =>
 const providerApiKey = process.env.ALCHEMY_API_KEY || "";
 const deployerPrivateKey = process.env.PRIVATE_KEY || "";
 
-function validateParams(parameters: string[]){
+function validateParams(parameters: string[]) {
   if (!parameters || parameters.length < 4) {
     console.log(parameters);
     throw new Error("Invalid number of parameters");
   }
 
   const tokenAddress = parameters[0] as `0x${string}`;
-  if (!tokenAddress)
-    throw new Error("MyToken contract address not provided");
+  if (!tokenAddress) throw new Error("MyToken contract address not provided");
   if (!/^0x[a-fA-F0-9]{40}$/.test(tokenAddress))
     throw new Error("Invalid MyToken contract address");
 
-  const blockDuration = parameters[1];
-  if (isNaN(Number(blockDuration)) || Number(blockDuration) < 1)
+  let blockDuration = Number(parameters[1]);
+  if (isNaN(blockDuration) || !(blockDuration >= 1))
     throw new Error("Invalid duration");
 
   const proposals = parameters.slice(2);
@@ -57,15 +55,16 @@ function validateParams(parameters: string[]){
 
   return {
     tokenAddress,
-    blockDuration,
+    blockDuration: BigInt(blockDuration),
     proposals,
   };
 }
 
 /// MAIN FUNCTION
 async function main() {
-
-  const { tokenAddress, blockDuration, proposals } = validateParams(process.argv.slice(2));
+  const { tokenAddress, blockDuration, proposals } = validateParams(
+    process.argv.slice(2)
+  );
 
   console.log("Proposals: ");
   proposals.forEach((element, index) => {
@@ -74,20 +73,20 @@ async function main() {
   console.log(`ERC20 Token Contract Address: ${tokenAddress}`);
 
   /// CREATE PUBLIC CLIENT TO CONNECT TO SEPOLIA TESTNET USING POKT GATEWAY
-  console.log("\nConnecting to blockchain with publicClient...")
+  console.log("\nConnecting to blockchain with publicClient...");
   const publicClient = createPublicClient({
     chain: sepolia,
     transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`),
   });
-	
-  /// - PROVIDE PROOF OF SUCCESSFUL PUBLIC CLIENT CREATION
-  let blockNumber = await publicClient.getBlockNumber();
+
+  /// Set targetBlockNumber
+  let blockNumber: bigint = await publicClient.getBlockNumber();
   console.log("Last block number:", blockNumber);
-  /// - SET pastBlockNumber parameter
-  const targetBlockNumber = blockNumber + blockDuration;
+  const targetBlockNumber: bigint = blockNumber + blockDuration;
+  console.log(`Target block number: ${targetBlockNumber}`);
 
   /// SETUP WALLET CLIENT USING MY PRIVATE KEY
-  console.log("\nSetting up deployer wallet...")
+  console.log("\nSetting up deployer wallet...");
   const account = privateKeyToAccount(`0x${deployerPrivateKey}`);
   const deployer = createWalletClient({
     account: account,
@@ -115,7 +114,7 @@ async function main() {
     args: [
       proposals.map((prop) => toHex(prop, { size: 32 })),
       tokenAddress,
-      targetBlockNumber
+      targetBlockNumber,
     ],
   });
   /// - LOG PROOF OF SUCCESSFUL DEPLOYMENT TRANSACTION
@@ -137,7 +136,7 @@ async function main() {
       address: receipt.contractAddress as `0x${string}`,
       abi,
       functionName: "proposals",
-      args: [BigInt(index)]
+      args: [BigInt(index)],
     })) as any[];
     const name = hexToString(proposal[0], { size: 32 });
     console.log({ index, name, proposal });
@@ -159,12 +158,11 @@ async function main() {
   //   abi: myERC20TokenContractAbi,
   //   functionName: "delegate",
   //   account: deployerAcct,
-  //   args: [deployer.account.address], 
+  //   args: [deployer.account.address],
   // });
   // console.log(`Deployer has delegated himself voting tokens`)
 
   // await waitForTransactionSuccess(publicClient, deployerDelegateVotingRights);
-
 
   // // ? the abi you are using is the abi of the TokenizedBallot contract, not the ERC20 contract
   // // ? thus the error 'Function "getVotes" not found on ABI'.

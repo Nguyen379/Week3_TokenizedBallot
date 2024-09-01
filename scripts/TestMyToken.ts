@@ -17,7 +17,6 @@ function cropAddress(address: string) {
 
 async function main() {
 
-
     // Deploying contracts to HRE using Viem
     const publicClient = await viem.getPublicClient();
     const [deployer, acc1, acc2, acc3] = await viem.getWalletClients();

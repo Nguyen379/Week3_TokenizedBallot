@@ -1,6 +1,6 @@
 // npx ts-node --files ./scripts/CastVote.ts BALLOT_ADDRESS PROPOSAL_INDEX AMOUNT
-// npx ts-node --files ./scripts/CastVote.ts 0x2f21fdeccb32a0b580e7fbb9517a2a63d3af690f 1 100
-
+// npx ts-node --files ./scripts/CastVote.ts 0x2bd6a1160bb05d2ea9ac57cb4584fca3c32e5d52 0 100
+// https://sepolia.etherscan.io/tx/0x5dc56d1ee3908ce25e6dcfb56d568511983b0c2d7ecd1ac0372832b89affab0f
 import { viem } from "hardhat";
 import { createPublicClient, http, createWalletClient, hexToString } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -43,10 +43,15 @@ function validateParams(parameters: string[]) {
   const VOTES = parameters[2];
   if (isNaN(Number(VOTES))) throw new Error("Invalid number of votes");
 
-  return { ballotAddress, proposalIndex, VOTES };
+  return { 
+		ballotAddress, 
+		proposalIndex: BigInt(proposalIndex), 
+		VOTES: BigInt(VOTES) 
+	};
 }
 
 async function main() {
+	
 	const { ballotAddress, proposalIndex, VOTES } = validateParams(process.argv.slice(2));
 
 	const publicClient = createPublicClient({
@@ -54,6 +59,24 @@ async function main() {
     transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`)
   });
 
+	const targetBlockNumber: bigint = await publicClient.readContract({
+		address: ballotAddress,
+		abi,
+		functionName: "targetBlockNumber",
+		args: [],
+	}) as any;
+
+	/// Check targetBlockNumber
+	let blockNumber: bigint = await publicClient.getBlockNumber();
+	if (blockNumber < targetBlockNumber){
+		console.log("ERC5805FutureLookup");
+		rl.close();
+		process.exit();
+	} 
+	console.log("Current block number:", blockNumber);
+	console.log(`Ballot targetBlockNumber: ${targetBlockNumber}`);
+
+	/// Create wallet client
   const account = privateKeyToAccount(`0x${deployerPrivateKey}`);
   const deployer = createWalletClient({
     account,
@@ -77,29 +100,18 @@ async function main() {
 			address: ballotAddress,
 			abi,
 			functionName: "vote",
-			args: [proposalIndex, VOTES],
+			args: [BigInt(proposalIndex), BigInt(VOTES)],
 		});
 		console.log("Transaction hash:", hash);
 		console.log("Waiting for confirmations...");
 		const receipt = await publicClient.waitForTransactionReceipt({ hash });
 		console.log(`Transaction confirmed: ${receipt.status}`);
-		console.log("CastVote deployed to:", receipt.contractAddress);
-		
-		if (!receipt.contractAddress) {
-			console.log("Cast vote failed");
-		} else {
-			// Check voting results
-			const proposalCount = await publicClient.readContract({
-				address: ballotAddress,
-				abi,
-				functionName: "proposals",
-				args: [],
-			}) as any;
 
+		if (receipt.status == "success") {
 			console.log("Proposals:");
-			for (let index = 0; index < proposalCount; index++) {
+			for (let index = 0; index < 3; index++) {
 				const proposal = (await publicClient.readContract({
-					address: receipt.contractAddress as `0x${string}`,
+					address: "0x2bd6a1160bb05d2ea9ac57cb4584fca3c32e5d52",
 					abi,
 					functionName: "proposals",
 					args: [BigInt(index)]
